@@ -6,6 +6,19 @@ class TennisGame3 implements TennisGame
 {
     private int $player2Point = 0;
     private int $player1Point = 0;
+    private const PLAYER_POINTS = [
+        0 => 'Love',
+        1 => 'Fifteen',
+        2 => 'Thirty',
+        3 => 'Forty',
+    ];
+    private const EQUAL_POINTS_SCORE = [
+        0 => 'Love-All',
+        1 => 'Fifteen-All',
+        2 => 'Thirty-All',
+        3 => 'Deuce',
+    ];
+    private const THRESHOLD = 3;
 
     public function __construct(private string $player1Name, private string $player2Name)
     {
@@ -13,14 +26,14 @@ class TennisGame3 implements TennisGame
 
     public function getScore(): string
     {
-        if ($this->arePointsEqual()) {
-            return $this->getEqualScore();
+        if ($this->arePointsEqual($this->player1Point, $this->player2Point)) {
+            return $this->getEqualScore($this->player1Point);
         }
 
         if ($this->player1Point < 4 && $this->player2Point < 4) {
 
-            $player1PointName = $this->getPlayerScore($this->player1Point);
-            $player2PointName = $this->getPlayerScore($this->player2Point);
+            $player1PointName = $this->getPlayerPoint($this->player1Point);
+            $player2PointName = $this->getPlayerPoint($this->player2Point);
 
             return "{$player1PointName}-{$player2PointName}";
         }
@@ -42,29 +55,23 @@ class TennisGame3 implements TennisGame
         return $this->player1Point > $this->player2Point ? $this->player1Name : $this->player2Name;
     }
 
-    private function getPlayerScore(int $playersPoints): string
+    private function getPlayerPoint(int $playersPoints): string
     {
-        return match ($playersPoints) {
-            0 => 'Love',
-            1 => 'Fifteen',
-            2 => 'Thirty',
-            default => 'Forty',
-        };
+        return $playersPoints < self::THRESHOLD
+            ? self::PLAYER_POINTS[$playersPoints]
+            : self::PLAYER_POINTS[self::THRESHOLD];
     }
 
-    private function getEqualScore(): string
+    private function getEqualScore(int $playerPoint): string
     {
-        return match ($this->player1Point) {
-            0 => "Love-All",
-            1 => "Fifteen-All",
-            2 => "Thirty-All",
-            default => "Deuce",
-        };
+        return $playerPoint < self::THRESHOLD
+            ? self::EQUAL_POINTS_SCORE[$playerPoint]
+            : self::EQUAL_POINTS_SCORE[self::THRESHOLD];
     }
 
-    private function arePointsEqual(): bool
+    private function arePointsEqual(int $player1Point, int $player2Point): bool
     {
-        return $this->player1Point === $this->player2Point;
+        return $player1Point === $player2Point;
     }
 
 
